@@ -1,5 +1,4 @@
-﻿using DomainModel.Common;
-using DomainModel.Models;
+﻿using DomainModel.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -12,12 +11,16 @@ public class EmployeeConfiguration : IEntityTypeConfiguration<Employee>
         builder.ToTable("Employees", "dbo");
         builder.HasKey(e => e.EmployeeId);
 
-        builder.Property(e => e.UserId)
-            .HasConversion(id => id.Value, value => UserId.From(value))
+        builder.Ignore(e => e.UserId);
+
+        builder.Property<string>("_identityUserId")
+            .HasColumnName("UserId")
             .HasMaxLength(450)
             .IsRequired();
 
-        builder.HasIndex(e => e.UserId).IsUnique();
+        builder.HasIndex("_identityUserId")
+            .IsUnique()
+            .HasDatabaseName("IX_Employees_UserId");
 
         builder.Property(e => e.AssignedAt)
             .HasColumnType("datetime2(0)")
@@ -38,7 +41,7 @@ public class EmployeeConfiguration : IEntityTypeConfiguration<Employee>
 
         builder.HasOne<ApplicationUser>()
             .WithOne(u => u.Employee)
-            .HasForeignKey<Employee>(e => e.UserId)
+            .HasForeignKey<Employee>("_identityUserId")
             .HasPrincipalKey<ApplicationUser>(u => u.Id)
             .OnDelete(DeleteBehavior.Restrict);
 

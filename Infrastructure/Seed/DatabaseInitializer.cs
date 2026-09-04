@@ -109,7 +109,8 @@ public static class DatabaseInitializer
                 continue;
             }
 
-            var alreadyLinked = await context.Employees.AnyAsync(e => e.UserId.Value == user.Id);
+            var alreadyLinked = await context.Employees.AnyAsync(e =>
+                EF.Property<string>(e, "_identityUserId") == user.Id);
             if (!alreadyLinked)
             {
                 context.Employees.Add(new Employee

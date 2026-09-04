@@ -4,9 +4,16 @@ namespace DomainModel.Models;
 
 public class Employee
 {
+    private string _identityUserId = null!;
+
     public int EmployeeId { get; set; }
 
-    public UserId UserId { get; set; } = null!;
+    public UserId UserId
+    {
+        get => UserId.From(_identityUserId);
+        set => _identityUserId = value.Value;
+    }
+
     public int LaboratoryDepartmentId { get; set; }
     public LaboratoryDepartment LaboratoryDepartment { get; set; } = null!;
 
